@@ -1,0 +1,246 @@
+\documentclass{article}
+
+% Paquetes necesarios
+\usepackage[utf8]{inputenc} % Codificación de entrada
+\usepackage[spanish]{babel} % Soporte para idioma español
+\usepackage{amsmath}        % Para fórmulas matemáticas (sqrt, sum, etc.)
+\usepackage{amssymb}        % Para símbolos matemáticos (no estrictamente necesario aquí, pero común)
+\usepackage{geometry}       % Para ajustar márgenes
+\usepackage{hyperref}       % Para enlaces clicables (URLs)
+\usepackage{url}            % Para formatear URLs si no usas href de hyperref
+\usepackage{enumitem}       % Para personalizar listas (opcional, pero útil)
+
+% Configurar geometría (ajustar márgenes si es necesario)
+\geometry{a4paper, margin=1in}
+
+% --- Título, Autor, Fecha ---
+\title{Informe del Proyecto Integrador: Sistema de Recomendación Musical}
+
+\author{%
+    [Nombre del Integrante 1] \\
+    [Nombre del Integrante 2] \\
+    [Nombre del Integrante 3] \\
+    % Agregar más líneas si hay más integrantes
+    % [Nombre del Integrante X]
+}
+
+\date{\today} % O puedes poner una fecha específica: \date{25 de Mayo de 2024}
+
+% --- Comandos personalizados ---
+% Comando para Palabras Clave después del abstract
+\newcommand{\keywords}[1]{\textbf{Palabras Clave:} #1}
+
+% --- Inicio del Documento ---
+\begin{document}
+
+\maketitle % Genera el bloque del título
+
+% Tabla de Contenidos (opcional, descomentar si se desea)
+% \tableofcontents
+% \newpage % Comentar si no quieres la tabla de contenidos en una página separada
+
+% --- Resumen ---
+\begin{abstract}
+El presente informe detalla el desarrollo de un sistema básico de recomendación musical en C++, como parte de un proyecto integrador que aborda el procesamiento de datos provenientes de archivos CSV. El sistema se centra en el Ejercicio 3, implementando un enfoque colaborativo basado en la similitud de usuarios y la popularidad de las canciones. Se describe la metodología utilizada para leer y pre-procesar los datos de puntuaciones de canciones, la definición de estructuras de datos para representar personas y canciones, el cálculo de la similitud entre usuarios mediante distancia euclidiana, la identificación de canciones candidatas y la estimación de la probabilidad de agrado para generar recomendaciones personalizadas. Se incluyen detalles sobre el ambiente de desarrollo y se hace mención a los resultados obtenidos, así como placeholders para los Ejercicios 1 y 2 que fueron parte del proyecto global.
+\end{abstract}
+
+% --- Palabras Clave ---
+\keywords{Sistema de Recomendación, Música, C++, CSV, Distancia Euclidiana, Rule of Succession, Filtrado Colaborativo, Pre-procesamiento de Datos.}
+
+% --- 1. Introducción ---
+\section{Introducción}
+
+En la era digital, donde la cantidad de contenido disponible es vasta, los sistemas de recomendación se han vuelto herramientas indispensables para ayudar a los usuarios a descubrir elementos de interés. Este proyecto integrador se enfoca en la creación de un prototipo de sistema de recomendación musical, utilizando un conjunto de datos proporcionado en formato CSV. El proyecto se estructuró en tres ejercicios principales:
+
+\begin{itemize}
+    \item \textbf{Ejercicio 1:} [Placeholder: Aquí se realizó la actividad relacionada con... (detallar brevemente o dejar como placeholder)].
+    \item \textbf{Ejercicio 2:} Posteriormente, se abordó el Ejercicio 2, que implicó... [Placeholder: (detallar brevemente o dejar como placeholder)].
+    \item \textbf{Ejercicio 3:} El foco principal de este informe, que consiste en desarrollar un sistema capaz de recomendar canciones a una persona específica basándose en las puntuaciones otorgadas por un conjunto de usuarios a diversas canciones.
+\end{itemize}
+
+El objetivo del Ejercicio 3 fue implementar un algoritmo de recomendación que analice las preferencias de los usuarios a partir de un archivo CSV, identifique patrones y similitudes, y genere un listado de las 10 canciones con mayor probabilidad de ser del agrado de un usuario dado. El presente documento describe en detalle el diseño, la implementación y el funcionamiento de la solución desarrollada para este ejercicio.
+
+% --- 2. Recursos del Proyecto ---
+\section{Recursos del Proyecto}
+
+Todo el material relacionado con este proyecto, incluyendo el código fuente completo para los Ejercicios 1, 2 (placeholders) y 3, el archivo de datos (\texttt{data.csv}), pruebas de concepto, y la documentación adicional generada por el equipo, se encuentra disponible en la siguiente ubicación compartida:
+
+\vspace{0.5em} % Pequeño espacio vertical
+\noindent \textbf{LINK DEL DRIVE COMPARTIDO CON EL PROFESOR:} \\
+\href{https://drive.google.com/drive/folders/1Yg4fcsVpM54-gkXYf1ld7ntsy1-vIW8o?usp=sharing}{https://drive.google.com/drive/folders/1Yg4fcsVpM54-gkXYf1ld7ntsy1-vIW8o?usp=sharing}
+
+% --- 3. Ambiente de Desarrollo ---
+\section{Ambiente de Desarrollo}
+
+Para el desarrollo e implementación del sistema de recomendación, se utilizó el siguiente ambiente de desarrollo:
+
+\begin{itemize}[label=\textbullet] % Usar un bullet point estándar
+    \item \textbf{Requisitos de Software:}
+    \begin{itemize}[label=\textendash] % Usar un guion para sub-items
+        \item Compilador de C++ que soporte el estándar C++11 o superior.
+        \item Editor de texto o Entorno de Desarrollo Integrado (IDE).
+        \item Terminal o línea de comandos para la compilación y ejecución.
+    \end{itemize}
+    \item \textbf{Plataforma S.O.:}
+    El desarrollo se llevó a cabo principalmente en sistemas operativos basados en [Indicar SO principal, ej: Linux (ej. Ubuntu), Windows, macOS]. La solución es compatible con cualquier sistema que cuente con un compilador C++ estándar.
+    \item \textbf{Compilador C++:}
+    Se utilizó [Indicar el compilador, ej: g++, Clang]. La versión específica del compilador utilizada fue [Indicar versión, ej: g++ 9.4.0].
+    \item \textbf{Plug-ins utilizados:}
+    No se requirieron plug-ins externos no estándar más allá de las bibliotecas incluidas en la distribución estándar de C++ (como \texttt{<iostream>}, \texttt{<fstream>}, \texttt{<string>}, \texttt{<sstream>}, \texttt{<vector>}, \texttt{<map>}, \texttt{<cmath>}, \texttt{<algorithm>}, \texttt{<set>}, \texttt{<limits>}).
+    \item \textbf{Proceso de preparación e instalación del ambiente:}
+    La preparación del ambiente consistió en la instalación del compilador [Indicar el compilador, ej: g++] a través del gestor de paquetes del sistema operativo ([Indicar gestor, ej: apt, yum, brew, o instalador para Windows/macOS]). Se eligió un editor de código simple [Indicar editor, ej: VS Code, Sublime Text, Vim] o un IDE [Indicar IDE, ej: CLion, Code::Blocks] para la escritura y gestión del código. La compilación se realizó desde la terminal utilizando el comando: \texttt{g++ ejer3.cpp -o recomendador -std=c++11 -Wall -Wextra -pedantic}, donde \texttt{ejer3.cpp} incluye indirectamente a \texttt{estructurasIniciales/arregloPersonas.cpp}. La ejecución se realizó posteriormente mediante \texttt{./recomendador}.
+\end{itemize}
+
+% --- 4. Diseño de la Propuesta ---
+\section{Diseño de la Propuesta (Ejercicio 3)}
+
+El diseño de la solución para el sistema de recomendación musical se basa en un enfoque híbrido que combina elementos de filtrado colaborativo basado en usuarios y la popularidad general de los ítems. La propuesta general se puede resumir en los siguientes pasos:
+
+\begin{enumerate}[label=\arabic*.] % Lista numerada
+    \item \textbf{Pre-procesamiento de Datos:} Leer y estructurar la información del archivo CSV, identificando personas y canciones únicas, y almacenando sus puntuaciones.
+    \item \textbf{Inicialización de Preferencias:} Representar las preferencias de cada persona como un vector numérico basado en sus puntuaciones a las canciones. Las canciones no puntuadas se inicializan con un valor neutral.
+    \item \textbf{Identificación del Círculo de Parecidos:} Para el usuario objetivo, encontrar a las 10 personas con gustos musicales más similares basándose en la distancia entre sus vectores de preferencias.
+    \item \textbf{Selección de Canciones Candidatas:} Generar una lista de canciones potencialmente interesantes para el usuario objetivo, combinando canciones que son populares dentro de su círculo de parecidos y canciones que son popularmente bien recibidas en general.
+    \item \textbf{Cálculo de Probabilidad de Agrado:} Para cada canción candidata, estimar la probabilidad de que le guste al usuario objetivo, utilizando una fórmula que pondera la probabilidad general de la canción con la probabilidad basada en la acogida dentro de su círculo de parecidos.
+    \item \textbf{Generación de Recomendaciones:} Seleccionar las 10 canciones candidatas con la mayor probabilidad de agrado calculada.
+\end{enumerate}
+
+Este diseño busca balancear la personalización basada en usuarios similares con la robustez de recomendar canciones que son generalmente populares o de alta calidad.
+
+% --- 5. Estructuras de Datos ---
+\section{Estructuras de Datos (Ejercicio 3)}
+
+La elección de las estructuras de datos fue fundamental para manejar eficientemente la información de personas, canciones y sus relaciones. Se definieron las siguientes estructuras principales y se utilizaron contenedores de la Standard Template Library (STL) de C++:
+
+\begin{itemize}[label=\textbullet]
+    \item \textbf{\texttt{struct Cancion}:} Representa una canción. Contiene campos para su identificador (\texttt{id<string>}), métricas calculadas durante el pre-procesamiento (\texttt{totalRatings}, \texttt{successes}, \texttt{sumScores}, \texttt{popularidad<double>}, \texttt{disfrute<double>}, \texttt{probGustar<double>}).
+    \begin{itemize}[label=\textendash]
+        \item \textit{Motivación:} Agrupar toda la información relevante de una canción en una sola entidad. Los campos calculados permiten tener métricas agregadas listas para su uso en el cálculo de probabilidades.
+    \end{itemize}
+    \item \textbf{\texttt{struct Persona}:} Representa un usuario. Contiene su identificador (\texttt{id<string>}), una lista de canciones que le gustaron (\texttt{cancionesGustar<vector<int>>} - almacenando índices), y el vector de sentimiento (\texttt{vectorSentimiento<vector<double>>}). Los campos \texttt{PersonasParecidas} y \texttt{CancionesPuedenGustar} descritos en la propuesta inicial se manejan de forma dinámica en el procesamiento principal sin necesidad de almacenarlos permanentemente en la estructura \texttt{Persona} para cada usuario, solo para el usuario sujeto en tiempo de ejecución.
+     \begin{itemize}[label=\textendash]
+        \item \textit{Motivación:} Centralizar la información de cada usuario. \texttt{cancionesGustar} permite un acceso rápido a las canciones que definitivamente le gustaron a una persona. \texttt{vectorSentimiento} es crucial para la comparación de similitud, utilizando un \texttt{std::vector<double>} para permitir un tamaño dinámico adaptado al número total de canciones.
+    \end{itemize}
+    \item \textbf{\texttt{std::vector<Persona>} personas:} Un vector que almacena todas las instancias de \texttt{struct Persona}.
+    \begin{itemize}[label=\textendash]
+        \item \textit{Motivación:} Permite acceder a las personas por índice, lo cual es útil después de mapear IDs a índices. Su naturaleza dinámica (\texttt{std::vector}) evita la necesidad de pre-definir un tamaño máximo fijo de antemano, adaptándose al número real de usuarios en el CSV.
+    \end{itemize}
+    \item \textbf{\texttt{std::vector<Cancion>} canciones:} Un vector que almacena todas las instancias de \texttt{struct Cancion}.
+    \begin{itemize}[label=\textendash]
+        \item \textit{Motivación:} Similar al vector de personas, permite acceso por índice después de mapear IDs, adaptándose dinámicamente al número de canciones.
+    \end{itemize}
+    \item \textbf{\texttt{std::map<std::string, int>} personaMap:} Mapea el \texttt{personId} (string) al índice correspondiente en el vector \texttt{personas}.
+    \begin{itemize}[label=\textendash]
+        \item \textit{Motivación:} Permite una búsqueda rápida (\texttt{O(log N)}) del índice de una persona dado su ID de texto, facilitando la localización del sujeto y otras personas por ID.
+    \end{itemize}
+    \item \textbf{\texttt{std::map<std::string, int>} cancionMap:} Mapea el \texttt{songId} (string) al índice correspondiente en el vector \texttt{canciones}.
+    \begin{itemize}[label=\textendash]
+        \item \textit{Motivación:} Similar a \texttt{personaMap}, permite la búsqueda rápida del índice de una canción por su ID.
+    \end{itemize}
+    \item \textbf{\texttt{std::vector<Rating>} rawRatings:} Una estructura temporal para almacenar las puntuaciones tal como se leen del CSV antes de haber identificado todos los IDs y tamaños definitivos.
+     \begin{itemize}[label=\textendash]
+        \item \textit{Motivación:} Permite realizar una primera pasada para identificar todos los IDs únicos de personas y canciones, y luego una segunda pasada para llenar los vectores de sentimiento y las estadísticas de las canciones una vez que el tamaño total es conocido.
+    \end{itemize}
+\end{itemize}
+
+La combinación de \texttt{std::vector} y \texttt{std::map} proporciona un equilibrio efectivo entre acceso por índice (para cálculos vectoriales y literación) y búsqueda por ID (para encontrar usuarios/canciones específicos del CSV).
+
+% --- 6. Metodología y Algoritmos ---
+\section{Metodología y Algoritmos (Ejercicio 3)}
+
+La implementación del sistema de recomendación siguió los pasos definidos en el diseño:
+
+\subsection{Pre-procesamiento de Datos}
+La función \texttt{loadCSV(const std::string\& filename)} se encarga de leer el archivo CSV. Se realiza una doble pasada:
+\begin{enumerate}[label=\arabic*.]
+    \item La primera pasada identifica todos los \texttt{personId} y \texttt{songId} únicos, poblando \texttt{personaMap} y \texttt{cancionMap}, y creando las entradas iniciales en los vectores \texttt{personas} y \texttt{canciones}. Además, almacena cada puntuación leída en el vector \texttt{rawRatings} junto con los índices (ya asignados) de la persona y la canción.
+    \item Una vez finalizada la primera pasada y conocidos los tamaños totales de \texttt{personas} y \texttt{canciones}, se inicializan los vectores \texttt{vectorSentimiento} de cada persona con un valor por defecto de 2.5 para todas las canciones (representando una calificación neutral o la ausencia de calificación).
+    \item La segunda pasada itera sobre \texttt{rawRatings}. Para cada puntuación, se actualiza el valor correspondiente en el \texttt{vectorSentimiento} de la persona y se acumulan las estadísticas (\texttt{totalRatings}, \texttt{sumScores}, \texttt{successes}) para la canción. Si la puntuación es mayor a 4, el índice de la canción se añade al \texttt{cancionesGustar} de la persona.
+    \item Finalmente, se calculan y asignan las métricas \texttt{popularidad}, \texttt{disfrute} y \texttt{probGustar} para cada canción basándose en las estadísticas acumuladas. La \texttt{probGustar} general se calcula usando la Regla de Sucesión de Laplace \((successes + 1.0) / (totalRatings + 2.0)\).
+\end{enumerate}
+
+\subsection{Procesamiento para Recomendación}
+Una vez que los datos están cargados y pre-procesados, el programa espera el \texttt{personId} del sujeto para quien se generarán las recomendaciones.
+
+\subsubsection{Hallazgo del Círculo de Parecidos}
+La función \texttt{findSimilarUsers(int subjectIndex)} calcula la similitud entre el sujeto y todas las demás personas. Se utiliza la \textbf{distancia euclidiana} entre los \texttt{vectorSentimiento} de dos personas como métrica de disimilitud.
+
+\vspace{0.5em} % Espacio antes de la fórmula
+\noindent \textit{Procedimiento y Cálculo:} La distancia euclidiana entre dos vectores \(A = (a_1, a_2, ..., a_n)\) y \(B = (b_1, b_2, ..., b_n)\) se calcula como:
+\[
+d(A, B) = \sqrt{\sum_{i=1}^{n} (a_i - b_i)^2}
+\]
+Donde \(a_i\) y \(b_i\) son las puntuaciones (o 2.5 si no calificó) de la persona A y B respectivamente para la canción \(i\).
+
+\vspace{0.5em} % Espacio después de la fórmula
+\noindent \textit{Justificación:} La distancia euclidiana es una métrica común para medir la "distancia" o disimilitud en un espacio vectorial. En este contexto, un valor menor indica que las preferencias de dos personas son más cercanas (más parecidas). Se eligió por su simplicidad y efectividad para vectores que representan características cuantitativas como las puntuaciones. Otras métricas como la distancia Manhattan o la similitud coseno podrían haber sido alternativas válidas, cada una con sus propias propiedades (Manhattan menos sensible a valores atípicos, Coseno sensible a la dirección del vector independientemente de la magnitud, útil para datos dispersos o normalizados). La distancia euclidiana se adapta bien a nuestro vector de preferencias densamente poblado (gracias a la inicialización en 2.5).
+
+Se almacenan las distancias calculadas y se ordenan para identificar los 10 usuarios (excluyendo al sujeto) con la menor distancia euclidiana.
+
+\subsubsection{Identificación de Canciones Candidatas}
+La función \texttt{getCandidateSongs(const std::vector<int>\& similarUserIndices)} crea un conjunto (\texttt{std::set}) de índices de canciones candidatas:
+\begin{itemize}[label=\textbullet]
+    \item Canciones que les gustaron (score $>$ 4) a al menos \texttt{MIN\_LIKES\_IN\_CIRCLE} (definido como 5) personas dentro del círculo de parecidos.
+    \item Las \texttt{NUM\_TOP\_GENERAL\_SONGS} (definido como 50) canciones con la mayor \texttt{probGustar} general calculada en el pre-procesamiento.
+\end{itemize}
+El uso de un \texttt{std::set} asegura que cada canción candidata aparezca solo una vez.
+
+\subsubsection{Cálculo de Probabilidad de Recomendación}
+La función \texttt{calculateRecommendationProbabilities(...)} itera sobre las canciones candidatas. Para cada candidata, calcula una probabilidad final de que le guste al sujeto utilizando la fórmula especificada:
+\[
+P(\text{gusta de la canción}) = 0.5 \times (P(A) + P(B))
+\]
+
+\vspace{0.5em} % Espacio antes de procedimiento
+\noindent \textit{Procedimiento y Cálculo:}
+\begin{itemize}[label=\textbullet]
+    \item \(P(A)\): Corresponde a la \texttt{probGustar} general de la canción, calculada en el pre-procesamiento usando la Regla de Sucesión.
+    \item \(P(B)\): Corresponde a la probabilidad de que la canción guste de acuerdo al círculo de parecidos. Se calcula contando cuántas personas \textit{en el círculo de parecidos} calificaron la canción con más de 4.0 (\texttt{aciertosInCircle}). Según la regla específica provista, esta probabilidad se calcula como \((aciertosInCircle + 1.0) / 12.0\).
+\end{itemize}
+
+\vspace{0.5em} % Espacio después de procedimiento
+\noindent \textit{Justificación:} Ponderar \(P(A)\) y \(P(B)\) (con un peso de 0.5 cada una) combina la información global sobre la canción (su probabilidad general de gustar) con la información específica del contexto del sujeto (cómo le gustó a personas con gustos similares). Esto ayuda a evitar recomendar canciones impopulares incluso si gustan a un círculo pequeño, y a la vez, a personalizar las recomendaciones más allá de solo mostrar las canciones más populares globalmente. El uso de la regla \((aciertos + 1) / 12\) para \(P(B)\) sigue la especificación provista, aunque una versión más estándar sería \((aciertos + 1) / (participaciones + 2)\) donde 'participaciones' es el número de personas en el círculo que \textit{calificaron} la canción. Se implementó la fórmula \((aciertos + 1) / 12\) directamente como se especificó.
+
+\subsubsection{Generación y Visualización de Recomendaciones}
+Las canciones candidatas junto con sus probabilidades calculadas se almacenan en un vector de pares \texttt{\{probabilidad, songIndex\}}. Este vector se ordena en orden descendente por probabilidad. Finalmente, se muestran por pantalla los ID de las 10 canciones con mayor probabilidad, junto con su probabilidad calculada y algunas métricas generales de la canción (\texttt{Popularidad General}, \texttt{Disfrute Promedio}).
+
+% --- 7. Pruebas y Resultados ---
+\section{Pruebas y Resultados}
+
+[Esta sección es opcional pero útil. Describe cómo probaste el código y qué observaste.]
+Se realizaron pruebas utilizando el archivo \texttt{data.csv} proporcionado/creado. Se ingresaron diferentes \texttt{personId}s para verificar que el sistema identificara correctamente al sujeto, encontrara usuarios similares y generara un listado de recomendaciones. La salida del programa muestra las 10 canciones recomendadas ordenadas por la probabilidad calculada, permitiendo verificar la plausibilidad de las recomendaciones (ej., ¿las canciones recomendadas tienen algo en común con las que ya le gustaron al sujeto o a usuarios similares?). [Opcional: Mencionar si se encontraron errores y cómo se corrigieron].
+
+% --- 8. Conclusiones ---
+\section{Conclusiones}
+
+El desarrollo del sistema de recomendación musical para el Ejercicio 3 permitió la aplicación práctica de conceptos como el procesamiento de datos estructurados (CSV), la representación vectorial de preferencias de usuario, el cálculo de similitud mediante distancia euclidiana, y la combinación de diferentes fuentes de información (popularidad general y comportamiento de usuarios similares) para generar recomendaciones.
+
+La estructura del proyecto, aunque siguió la directriz de incluir archivos \texttt{.cpp}, demostró la importancia de la modularidad (pre-procesamiento separado del procesamiento principal). Las estructuras de datos elegidas, combinando \texttt{std::vector} y \texttt{std::map}, facilitaron la gestión eficiente de un conjunto de datos que puede crecer en número de personas y canciones.
+
+El algoritmo implementado, basado en la identificación del círculo de parecidos y el cálculo de una probabilidad de agrado híbrida, provee una base funcional para un sistema de recomendación. Si bien es un modelo simplificado, ilustra los principios fundamentales detrás de muchos sistemas colaborativos. Futuras mejoras podrían incluir el uso de métricas de similitud más robustas para datos dispersos, técnicas avanzadas para la selección de candidatos, y la evaluación del rendimiento del sistema con métricas de recomendación estándar (ej., precisión, recall).
+
+[Placeholder para conclusiones de Ejercicio 1 y 2 si quieres integrarlas aquí también]
+En conjunto con los Ejercicios 1 y 2 [Brevemente mencionar qué aportaron al proyecto global si aplica, o simplemente reconocer que fueron parte del proyecto], este proyecto proporcionó una experiencia valiosa en el manejo de datos y la implementación de algoritmos en C++.
+
+% --- Referencias ---
+\section*{Referencias} % Sección sin numerar
+\addcontentsline{toc}{section}{Referencias} % Agrega la sección de referencias a la tabla de contenidos si está activa
+
+\begin{thebibliography}{99} % El número 99 es para reservar espacio para la etiqueta más ancha
+
+    % Ejemplo de entrada de referencia (reemplazar con referencias reales si las hay)
+    %\bibitem{apellidoaño} Apellido, Nombre. (Año). \textit{Título del libro}. Editorial.
+    %\bibitem{articuloaño} Apellido, Nombre. (Año). Título del artículo. \textit{Nombre de la Revista}, Volumen(Número), Páginas.
+
+    % Placeholders para potenciales referencias
+    \bibitem{placeholderRef1} [Referencia 1: Si utilizaste alguna fuente externa específica (libro, artículo, web) para algún algoritmo, concepto, etc.]
+    \bibitem{placeholderRef2} [Referencia 2: ...]
+
+\end{thebibliography}
+
+% --- Nota Final ---
+\vspace{1em} % Espacio antes de la nota
+\noindent \textbf{Nota:} Este informe se ha redactado en formato de ensayo libre, incorporando elementos comunes de informes técnicos y estructuras referenciales (APA/IEEE) en la medida que aplican a la naturaleza del proyecto.
+
+% --- Fin del Documento ---
+\end{document}

@@ -2,3 +2,7 @@
 ratings_s.csv
 makefile
 recomendador
+*.aux
+*.log
+*.out
+*.pdf
