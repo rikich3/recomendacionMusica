@@ -9,6 +9,7 @@
 \usepackage{hyperref}       % Para enlaces clicables (URLs)
 \usepackage{url}            % Para formatear URLs si no usas href de hyperref
 \usepackage{enumitem}       % Para personalizar listas (opcional, pero útil)
+\usepackage{listings}       % Para insertar código fuente (lstlisting)
 
 % Configurar geometría (ajustar márgenes si es necesario)
 \geometry{a4paper, margin=1in}
@@ -17,14 +18,14 @@
 \title{Informe del Proyecto Integrador: Sistema de Recomendación Musical}
 
 \author{%
-    [Nombre del Integrante 1] \\
-    [Nombre del Integrante 2] \\
-    [Nombre del Integrante 3] \\
+    Chambilla Perca Ricardo Mauricio \\
+    Jorge Luis Mamani Huarsaya \\
+    Arias Quispe, Jhonatan David
     % Agregar más líneas si hay más integrantes
-    % [Nombre del Integrante X]
+    % Nombre del Integrante X
 }
 
-\date{\today} % O puedes poner una fecha específica: \date{25 de Mayo de 2024}
+\date{16 de Junio de 2025} % O puedes poner una fecha específica: \date{25 de Mayo de 2024}
 
 % --- Comandos personalizados ---
 % Comando para Palabras Clave después del abstract
@@ -34,7 +35,6 @@
 \begin{document}
 
 \maketitle % Genera el bloque del título
-
 % Tabla de Contenidos (opcional, descomentar si se desea)
 % \tableofcontents
 % \newpage % Comentar si no quieres la tabla de contenidos en una página separada
@@ -53,17 +53,19 @@ El presente informe detalla el desarrollo de un sistema básico de recomendació
 En la era digital, donde la cantidad de contenido disponible es vasta, los sistemas de recomendación se han vuelto herramientas indispensables para ayudar a los usuarios a descubrir elementos de interés. Este proyecto integrador se enfoca en la creación de un prototipo de sistema de recomendación musical, utilizando un conjunto de datos proporcionado en formato CSV. El proyecto se estructuró en tres ejercicios principales:
 
 \begin{itemize}
-    \item \textbf{Ejercicio 1:} [Placeholder: Aquí se realizó la actividad relacionada con... (detallar brevemente o dejar como placeholder)].
-    \item \textbf{Ejercicio 2:} Posteriormente, se abordó el Ejercicio 2, que implicó... [Placeholder: (detallar brevemente o dejar como placeholder)].
-    \item \textbf{Ejercicio 3:} El foco principal de este informe, que consiste en desarrollar un sistema capaz de recomendar canciones a una persona específica basándose en las puntuaciones otorgadas por un conjunto de usuarios a diversas canciones.
+    \item \textbf{Ejercicio 1:} Consulta de las 10 músicas más validadas (top-k y bottom-k).
+    \item \textbf{Ejercicio 2:} Identificación de usuarios que comparten gustos (búsqueda de vecinos cercanos).
+    \item \textbf{Ejercicio 3:} Recomendación de músicas por usuario.
 \end{itemize}
+
 
 El objetivo del Ejercicio 3 fue implementar un algoritmo de recomendación que analice las preferencias de los usuarios a partir de un archivo CSV, identifique patrones y similitudes, y genere un listado de las 10 canciones con mayor probabilidad de ser del agrado de un usuario dado. El presente documento describe en detalle el diseño, la implementación y el funcionamiento de la solución desarrollada para este ejercicio.
 
 % --- 2. Recursos del Proyecto ---
 \section{Recursos del Proyecto}
 
-Todo el material relacionado con este proyecto, incluyendo el código fuente completo para los Ejercicios 1, 2 (placeholders) y 3, el archivo de datos (\texttt{data.csv}), pruebas de concepto, y la documentación adicional generada por el equipo, se encuentra disponible en la siguiente ubicación compartida:
+Los Ejercicios A y B sirvieron como base para explorar estructuras de datos y algoritmos eficientes en el manejo de grandes volúmenes de datos y la búsqueda de similitudes, conocimientos que fueron aplicados y expandidos en el desarrollo del sistema de recomendación del Ejercicio C. El presente documento describe en detalle la solución desarrollada para cada uno de estos ejercicios, haciendo mayor énfasis en el Ejercicio C, que constituye el objetivo principal del caso de estudio.
+
 
 \vspace{0.5em} % Pequeño espacio vertical
 \noindent \textbf{LINK DEL DRIVE COMPARTIDO CON EL PROFESOR:} \\
@@ -82,16 +84,86 @@ Para el desarrollo e implementación del sistema de recomendación, se utilizó 
         \item Terminal o línea de comandos para la compilación y ejecución.
     \end{itemize}
     \item \textbf{Plataforma S.O.:}
-    El desarrollo se llevó a cabo principalmente en sistemas operativos basados en [Indicar SO principal, ej: Linux (ej. Ubuntu), Windows, macOS]. La solución es compatible con cualquier sistema que cuente con un compilador C++ estándar.
+    El desarrollo se llevó a cabo principalmente en sistemas operativos basados en Linux (Fedora, Ubuntu, Arch). La solución es compatible con cualquier sistema que cuente con un compilador C++ estándar.
     \item \textbf{Compilador C++:}
-    Se utilizó [Indicar el compilador, ej: g++, Clang]. La versión específica del compilador utilizada fue [Indicar versión, ej: g++ 9.4.0].
+    Se utilizó la version g++ (GCC). La versión específica del compilador utilizada fue 14.3.1 20250523.
     \item \textbf{Plug-ins utilizados:}
     No se requirieron plug-ins externos no estándar más allá de las bibliotecas incluidas en la distribución estándar de C++ (como \texttt{<iostream>}, \texttt{<fstream>}, \texttt{<string>}, \texttt{<sstream>}, \texttt{<vector>}, \texttt{<map>}, \texttt{<cmath>}, \texttt{<algorithm>}, \texttt{<set>}, \texttt{<limits>}).
     \item \textbf{Proceso de preparación e instalación del ambiente:}
-    La preparación del ambiente consistió en la instalación del compilador [Indicar el compilador, ej: g++] a través del gestor de paquetes del sistema operativo ([Indicar gestor, ej: apt, yum, brew, o instalador para Windows/macOS]). Se eligió un editor de código simple [Indicar editor, ej: VS Code, Sublime Text, Vim] o un IDE [Indicar IDE, ej: CLion, Code::Blocks] para la escritura y gestión del código. La compilación se realizó desde la terminal utilizando el comando: \texttt{g++ ejer3.cpp -o recomendador -std=c++11 -Wall -Wextra -pedantic}, donde \texttt{ejer3.cpp} incluye indirectamente a \texttt{estructurasIniciales/arregloPersonas.cpp}. La ejecución se realizó posteriormente mediante \texttt{./recomendador}.
+    La preparación del ambiente consistió en la instalación del compilador g++ a través del gestor de paquetes del sistema operativo correspondiente a los OS de los integrantes.
+    Se eligió un el IDE VSCODE para la escritura y gestión del código. La compilación se realizó desde la terminal utilizando los comandos: \texttt{g++ ejer3.cpp -o recomendador -std=c++11}, donde \texttt{ejer3.cpp} incluye indirectamente a \texttt{estructurasIniciales/arregloPersonas.cpp}. La ejecución se realizó posteriormente mediante \texttt{./recomendador}.
 \end{itemize}
 
 % --- 4. Diseño de la Propuesta ---
+
+\subsection{A. Consulta de las 10 Músicas más Validadas (Ejercicio A)}
+
+El objetivo de este ejercicio fue obtener las \(k\) canciones con la mayor valoración promedio (top-\(k\)) y las \(k\) con la menor valoración promedio (bottom-\(k\)) a partir del conjunto de datos.
+
+Inicialmente se consideraron técnicas de ordenamiento directo, que tienen una complejidad de \(O(N \log N)\) para el ordenamiento completo y \(O(k)\) para la selección de los extremos. Sin embargo, buscando una estructura de datos más eficiente para consultas dinámicas, se exploró el uso de la librería PBDS (\texttt{\_\_gnu\_pbds}) de GCC.
+
+Se propuso el uso de dos estructuras clave:
+\begin{itemize}[label=\textbullet]
+    \item \texttt{std::unordered\_map<int, Song*>}: Para acceder a una canción en tiempo constante \(O(1)\) usando su ID. (Aunque en la implementación final del Ejercicio 3 usamos string IDs y vectores con maps de string a índice, la idea conceptual de un mapa para acceso rápido se mantiene).
+    \item \texttt{\_\_gnu\_pbds::tree<Song*, null\_type, Cmp, rb\_tree\_tag, tree\_order\_statistics\_node\_update>}: Para mantener las canciones ordenadas dinámicamente por su media de valoraciones. Esta estructura, basada en un árbol rojo-negro balanceado, permite operaciones de inserción, eliminación y recorrido ordenado en \(O(\log m)\), donde \(m\) es el número de canciones distintas.
+\end{itemize}
+
+La estructura \texttt{Song} propuesta mantiene el ID, la suma total de valoraciones y el número de votos. La media se calcula a partir de estos campos. Cada vez que una canción recibe una nueva valoración, su información se actualiza y, si se usara el PBDS tree, la entrada correspondiente se reinsertaría para mantener el orden correcto.
+
+\begin{lstlisting}[language=C++, caption=Estructura Song propuesta]
+struct Song {
+    int id;
+    long long suma;
+    int votos;
+    double media() const { return 1.0 * suma / votos; }
+};
+\end{lstlisting}
+
+Se definió un comparador personalizado (\texttt{struct Cmp}) para el \texttt{tree} que ordena las canciones basándose primero en la media (descendente), luego en el número de votos (descendente) y finalmente en el ID (ascendente) como desempate.
+
+\begin{lstlisting}[language=C++, caption=Comparador Cmp para ordenar Songs]
+struct Cmp {
+    bool operator() (const Song* a, const Song* b) const {
+        if (a->media() != b->media()) return a->media() > b->media();
+        if (a->votos != b->votos ) return a->votos > b->votos;
+        return a->id < b->id;
+    }
+};
+\end{lstlisting}
+
+\vspace{0.5em}
+\noindent \textit{Complejidad Temporal:}
+\begin{itemize}[label=\textbullet]
+    \item Cargar y procesar el CSV toma un tiempo de \(O(N)\), donde \(N\) es el número total de registros.
+    \item Insertar/actualizar una canción en el PBDS tree toma un tiempo de \(O(\log m)\).
+    \item Obtener top-\(k\) o bottom-\(k\) canciones toma un tiempo de \(O(k)\) usando las funcionalidades del árbol (ej. \texttt{find\_by\_order}).
+\end{itemize}
+Donde \(N \approx 10^5\), \(m\) es el número de canciones distintas (\(m \ll N\)), y \(k\) es el número de resultados pedidos.
+
+Este enfoque con estructuras dinámicas garantiza que las consultas top-\(k\) y bottom-\(k\) se mantengan eficientes incluso con un gran número de canciones.
+
+\subsection{B. Los 6 Usuarios que Comparten Gustos (Ejercicio B)}
+
+Este ejercicio se centró en el problema de encontrar usuarios con gustos similares, lo cual se puede modelar como una búsqueda de vecinos más cercanos (K-Nearest Neighbors, KNN) en un espacio vectorial donde cada usuario es un punto y sus coordenadas son sus puntuaciones (o una representación similar) a las canciones.
+
+Para abordar eficientemente la búsqueda KNN en un espacio vectorial de alta dimensión (correspondiente al número de canciones) y potencialmente disperso, se eligió explorar el algoritmo \textbf{Hierarchical Navigable Small World (HNSW)}.
+
+\vspace{0.5em}
+\noindent \textit{Algoritmo HNSW:} HNSW es una estructura de datos y un algoritmo de búsqueda de vecinos aproximados que construye un grafo jerárquico. Cada nivel del grafo contiene un subconjunto de puntos, con menos puntos en los niveles superiores, permitiendo una navegación rápida. La base teórica se inspira en los Small World Graphs y Skip Lists.
+\begin{itemize}[label=\textbullet]
+    \item \textit{Inserción:} Un nuevo punto se inserta navegando el grafo desde el nivel superior, buscando vecinos cercanos en cada nivel y descendiendo progresivamente hasta el nivel base.
+    \item \textit{Búsqueda:} Para encontrar los K vecinos más cercanos a un punto de consulta, el algoritmo navega el grafo desde el nivel superior, moviéndose iterativamente al vecino más cercano encontrado en el nivel actual, y descendiendo hasta refinar la búsqueda en el nivel base.
+\end{itemize}
+
+\vspace{0.5em}
+\noindent \textit{Aplicación en el Caso Práctico:} Nuestro dataset (\texttt{<código\_usuario, código\_canción, valoración>}) representa un espacio disperso y de alta dimensión, ya que cada usuario califica solo un pequeño subconjunto de un gran número total de canciones. Encontrar usuarios similares en este contexto es crucial para la recomendación. HNSW es ideal por:
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Inserción Dinámica:} El grafo puede construirse incrementalmente al leer el archivo CSV.
+    \item \textbf{Alto Rendimiento:} Ofrece búsqueda de vecinos cercanos en tiempo sublineal promedio.
+    \item \textbf{Aproximación Controlada:} Permite ajustar parámetros para equilibrar velocidad y precisión.
+\end{itemize}
+Este ejercicio sirvió para entender y aplicar técnicas de búsqueda de similitud avanzadas, que son directamente relevantes para la parte de filtrado colaborativo del Ejercicio C, donde se necesitan encontrar los 10 usuarios más similares al sujeto.
+
 \section{Diseño de la Propuesta (Ejercicio 3)}
 
 El diseño de la solución para el sistema de recomendación musical se basa en un enfoque híbrido que combina elementos de filtrado colaborativo basado en usuarios y la popularidad general de los ítems. La propuesta general se puede resumir en los siguientes pasos:
@@ -113,32 +185,32 @@ Este diseño busca balancear la personalización basada en usuarios similares co
 La elección de las estructuras de datos fue fundamental para manejar eficientemente la información de personas, canciones y sus relaciones. Se definieron las siguientes estructuras principales y se utilizaron contenedores de la Standard Template Library (STL) de C++:
 
 \begin{itemize}[label=\textbullet]
-    \item \textbf{\texttt{struct Cancion}:} Representa una canción. Contiene campos para su identificador (\texttt{id<string>}), métricas calculadas durante el pre-procesamiento (\texttt{totalRatings}, \texttt{successes}, \texttt{sumScores}, \texttt{popularidad<double>}, \texttt{disfrute<double>}, \texttt{probGustar<double>}).
+    \item \textbf{\texttt{struct Cancion}:} Representa una canción. Contiene campos para su identificador (\texttt{id\textless{}string\textgreater{}}), métricas calculadas durante el pre-procesamiento (\texttt{totalRatings}, \texttt{successes}, \texttt{sumScores}, \texttt{popularidad\textless{}double\textgreater{}}, \texttt{disfrute\textless{}double\textgreater{}}, \texttt{probGustar\textless{}double\textgreater{}}).
     \begin{itemize}[label=\textendash]
         \item \textit{Motivación:} Agrupar toda la información relevante de una canción en una sola entidad. Los campos calculados permiten tener métricas agregadas listas para su uso en el cálculo de probabilidades.
     \end{itemize}
-    \item \textbf{\texttt{struct Persona}:} Representa un usuario. Contiene su identificador (\texttt{id<string>}), una lista de canciones que le gustaron (\texttt{cancionesGustar<vector<int>>} - almacenando índices), y el vector de sentimiento (\texttt{vectorSentimiento<vector<double>>}). Los campos \texttt{PersonasParecidas} y \texttt{CancionesPuedenGustar} descritos en la propuesta inicial se manejan de forma dinámica en el procesamiento principal sin necesidad de almacenarlos permanentemente en la estructura \texttt{Persona} para cada usuario, solo para el usuario sujeto en tiempo de ejecución.
-     \begin{itemize}[label=\textendash]
-        \item \textit{Motivación:} Centralizar la información de cada usuario. \texttt{cancionesGustar} permite un acceso rápido a las canciones que definitivamente le gustaron a una persona. \texttt{vectorSentimiento} es crucial para la comparación de similitud, utilizando un \texttt{std::vector<double>} para permitir un tamaño dinámico adaptado al número total de canciones.
+    \item \textbf{\texttt{struct Persona}:} Representa un usuario. Contiene su identificador (\texttt{id\textless{}string\textgreater{}}), una lista de canciones que le gustaron (\texttt{cancionesGustar\textless{}vector\textless{}int\textgreater{}\textgreater{}} - almacenando índices), y el vector de sentimiento (\texttt{vectorSentimiento\textless{}vector\textless{}double\textgreater{}\textgreater{}}). Los campos \texttt{PersonasParecidas} y \texttt{CancionesPuedenGustar} descritos en la propuesta inicial se manejan de forma dinámica en el procesamiento principal sin necesidad de almacenarlos permanentemente en la estructura \texttt{Persona} para cada usuario, solo para el usuario sujeto en tiempo de ejecución.
+    \begin{itemize}[label=\textendash]
+        \item \textit{Motivación:} Centralizar la información de cada usuario. \texttt{cancionesGustar} permite un acceso rápido a las canciones que definitivamente le gustaron a una persona. \texttt{vectorSentimiento} es crucial para la comparación de similitud, utilizando un \texttt{std::vector\textless{}double\textgreater{}} para permitir un tamaño dinámico adaptado al número total de canciones.
     \end{itemize}
-    \item \textbf{\texttt{std::vector<Persona>} personas:} Un vector que almacena todas las instancias de \texttt{struct Persona}.
+    \item \textbf{\texttt{std::vector\textless{}Persona\textgreater{}} personas:} Un vector que almacena todas las instancias de \texttt{struct Persona}.
     \begin{itemize}[label=\textendash]
         \item \textit{Motivación:} Permite acceder a las personas por índice, lo cual es útil después de mapear IDs a índices. Su naturaleza dinámica (\texttt{std::vector}) evita la necesidad de pre-definir un tamaño máximo fijo de antemano, adaptándose al número real de usuarios en el CSV.
     \end{itemize}
-    \item \textbf{\texttt{std::vector<Cancion>} canciones:} Un vector que almacena todas las instancias de \texttt{struct Cancion}.
+    \item \textbf{\texttt{std::vector\textless{}Cancion\textgreater{}} canciones:} Un vector que almacena todas las instancias de \texttt{struct Cancion}.
     \begin{itemize}[label=\textendash]
         \item \textit{Motivación:} Similar al vector de personas, permite acceso por índice después de mapear IDs, adaptándose dinámicamente al número de canciones.
     \end{itemize}
-    \item \textbf{\texttt{std::map<std::string, int>} personaMap:} Mapea el \texttt{personId} (string) al índice correspondiente en el vector \texttt{personas}.
+    \item \textbf{\texttt{std::map\textless{}std::string, int\textgreater{}} personaMap:} Mapea el \texttt{personId} (string) al índice correspondiente en el vector \texttt{personas}.
     \begin{itemize}[label=\textendash]
         \item \textit{Motivación:} Permite una búsqueda rápida (\texttt{O(log N)}) del índice de una persona dado su ID de texto, facilitando la localización del sujeto y otras personas por ID.
     \end{itemize}
-    \item \textbf{\texttt{std::map<std::string, int>} cancionMap:} Mapea el \texttt{songId} (string) al índice correspondiente en el vector \texttt{canciones}.
+    \item \textbf{\texttt{std::map\textless{}std::string, int\textgreater{}} cancionMap:} Mapea el \texttt{songId} (string) al índice correspondiente en el vector \texttt{canciones}.
     \begin{itemize}[label=\textendash]
         \item \textit{Motivación:} Similar a \texttt{personaMap}, permite la búsqueda rápida del índice de una canción por su ID.
     \end{itemize}
-    \item \textbf{\texttt{std::vector<Rating>} rawRatings:} Una estructura temporal para almacenar las puntuaciones tal como se leen del CSV antes de haber identificado todos los IDs y tamaños definitivos.
-     \begin{itemize}[label=\textendash]
+    \item \textbf{\texttt{std::vector\textless{}Rating\textgreater{}} rawRatings:} Una estructura temporal para almacenar las puntuaciones tal como se leen del CSV antes de haber identificado todos los IDs y tamaños definitivos.
+    \begin{itemize}[label=\textendash]
         \item \textit{Motivación:} Permite realizar una primera pasada para identificar todos los IDs únicos de personas y canciones, y luego una segunda pasada para llenar los vectores de sentimiento y las estadísticas de las canciones una vez que el tamaño total es conocido.
     \end{itemize}
 \end{itemize}
@@ -204,43 +276,25 @@ P(\text{gusta de la canción}) = 0.5 \times (P(A) + P(B))
 \subsubsection{Generación y Visualización de Recomendaciones}
 Las canciones candidatas junto con sus probabilidades calculadas se almacenan en un vector de pares \texttt{\{probabilidad, songIndex\}}. Este vector se ordena en orden descendente por probabilidad. Finalmente, se muestran por pantalla los ID de las 10 canciones con mayor probabilidad, junto con su probabilidad calculada y algunas métricas generales de la canción (\texttt{Popularidad General}, \texttt{Disfrute Promedio}).
 
-% --- 7. Pruebas y Resultados ---
-\section{Pruebas y Resultados}
-
-[Esta sección es opcional pero útil. Describe cómo probaste el código y qué observaste.]
-Se realizaron pruebas utilizando el archivo \texttt{data.csv} proporcionado/creado. Se ingresaron diferentes \texttt{personId}s para verificar que el sistema identificara correctamente al sujeto, encontrara usuarios similares y generara un listado de recomendaciones. La salida del programa muestra las 10 canciones recomendadas ordenadas por la probabilidad calculada, permitiendo verificar la plausibilidad de las recomendaciones (ej., ¿las canciones recomendadas tienen algo en común con las que ya le gustaron al sujeto o a usuarios similares?). [Opcional: Mencionar si se encontraron errores y cómo se corrigieron].
 
 % --- 8. Conclusiones ---
 \section{Conclusiones}
 
-El desarrollo del sistema de recomendación musical para el Ejercicio 3 permitió la aplicación práctica de conceptos como el procesamiento de datos estructurados (CSV), la representación vectorial de preferencias de usuario, el cálculo de similitud mediante distancia euclidiana, y la combinación de diferentes fuentes de información (popularidad general y comportamiento de usuarios similares) para generar recomendaciones.
+El desarrollo del sistema de recomendación musical permitió abordar diversas problemáticas del procesamiento de datos y la aplicación de algoritmos. El Ejercicio A proporcionó experiencia en el uso de estructuras de datos eficientes para consultas de ordenamiento, explorando opciones como el PBDS tree. El Ejercicio B introdujo el algoritmo HNSW como una solución avanzada para la búsqueda de similitud en espacios de alta dimensión, preparando el terreno para la componente de filtrado colaborativo. Finalmente, el Ejercicio C integró estas bases para construir un sistema de recomendación funcional, aplicando técnicas de pre-procesamiento, cálculo de similitud euclidiana y estimación de probabilidades utilizando la Regla de Sucesión. La implementación en C++ utilizando contenedores STL estándar y estructuras personalizadas demostró ser efectiva para manejar el conjunto de datos proporcionado. Si bien el modelo es un prototipo, ilustra los principios clave de los sistemas de recomendación colaborativos e híbridos.
 
-La estructura del proyecto, aunque siguió la directriz de incluir archivos \texttt{.cpp}, demostró la importancia de la modularidad (pre-procesamiento separado del procesamiento principal). Las estructuras de datos elegidas, combinando \texttt{std::vector} y \texttt{std::map}, facilitaron la gestión eficiente de un conjunto de datos que puede crecer en número de personas y canciones.
-
-El algoritmo implementado, basado en la identificación del círculo de parecidos y el cálculo de una probabilidad de agrado híbrida, provee una base funcional para un sistema de recomendación. Si bien es un modelo simplificado, ilustra los principios fundamentales detrás de muchos sistemas colaborativos. Futuras mejoras podrían incluir el uso de métricas de similitud más robustas para datos dispersos, técnicas avanzadas para la selección de candidatos, y la evaluación del rendimiento del sistema con métricas de recomendación estándar (ej., precisión, recall).
-
-[Placeholder para conclusiones de Ejercicio 1 y 2 si quieres integrarlas aquí también]
-En conjunto con los Ejercicios 1 y 2 [Brevemente mencionar qué aportaron al proyecto global si aplica, o simplemente reconocer que fueron parte del proyecto], este proyecto proporcionó una experiencia valiosa en el manejo de datos y la implementación de algoritmos en C++.
-
-% --- Referencias ---
-\section*{Referencias} % Sección sin numerar
-\addcontentsline{toc}{section}{Referencias} % Agrega la sección de referencias a la tabla de contenidos si está activa
+% \addcontentsline{toc}{section}{Referencias} % Agrega la sección de referencias a la tabla de contenidos si está activa
 
 \begin{thebibliography}{99} % El número 99 es para reservar espacio para la etiqueta más ancha
 
     % Ejemplo de entrada de referencia (reemplazar con referencias reales si las hay)
     %\bibitem{apellidoaño} Apellido, Nombre. (Año). \textit{Título del libro}. Editorial.
     %\bibitem{articuloaño} Apellido, Nombre. (Año). Título del artículo. \textit{Nombre de la Revista}, Volumen(Número), Páginas.
+% Referencias basadas en OCR page 17
+    \bibitem{watts1998collective} Watts, D. J., \& Strogatz, S. H. (1998). Collective dynamics of 'small-world' networks. \textit{Nature}, 393(6684), 440-442. \url{https://doi.org/10.1038/30918}
+    \bibitem{faiss} Facebook AI Research. (2023). FAISS: A library for efficient similarity search and clustering of dense vectors. \url{https://github.com/facebookresearch/faiss}
 
-    % Placeholders para potenciales referencias
-    \bibitem{placeholderRef1} [Referencia 1: Si utilizaste alguna fuente externa específica (libro, artículo, web) para algún algoritmo, concepto, etc.]
-    \bibitem{placeholderRef2} [Referencia 2: ...]
 
 \end{thebibliography}
-
-% --- Nota Final ---
-\vspace{1em} % Espacio antes de la nota
-\noindent \textbf{Nota:} Este informe se ha redactado en formato de ensayo libre, incorporando elementos comunes de informes técnicos y estructuras referenciales (APA/IEEE) en la medida que aplican a la naturaleza del proyecto.
 
 % --- Fin del Documento ---
 \end{document}
